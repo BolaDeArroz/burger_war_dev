@@ -1,21 +1,51 @@
 <?xml version="1.0"?>
 <launch>
   <arg name="side" default="r"/> <!-- "b" = blue side, "r" = red side  -->
-
     <!-- You can change control program  -->
 
-    <!-- sample program node -->
+    <!-- Launch Navigation -->
+    <include file="$(find burger_navigation)/launch/your_burger_navigation_sample.launch">
+    </include>
 
-    <node pkg="burger_war_dev" type="randomRun.py" name="randomRun" output="screen"/>
+    
+    
+    <node pkg="aruco_ros" type="marker_publisher" name="bla_sniper_aruco">
+       <param name="use_camera_info" value="False"/>
+       <remap from="/image" to="snipe_image" />
+       <remap from="~markers" to="target_id" />
+    </node>
 
-    <!-- END sample program node -->
+    <!-- my program node -->
+    <node pkg="burger_war_dev" type="pub_my_pose.py" name="my_pose_node" output="screen"> 
+    </node>
+    <node pkg="burger_war_dev" type="pub_score.py" name="pub_score" output="screen"> 
+    </node>
+    <node pkg="burger_war_dev" type="enemy_finder_from_camera.py" name="EnemyFinder" output="screen"> 
+    </node>
+    <node pkg="burger_war_dev" type="behavior.py" name="behavior_node" output="screen"> 
+    </node>
+    <node pkg="burger_war_dev" type="enemy_pos_from_lider.py" name="enemy_pos_from_lider" output="screen"> 
+    </node>
+    <node pkg="burger_war_dev" type="enemy_pos_from_score.py" name="enemy_pos_from_score" output="screen">
+        <param name="topic_ws" value="war_state" />
+        <param name="side" value="$(arg side)" />
+        <param name="rate" value="1" />
+    </node>
+    <node pkg="burger_war_dev" type="rem_time.py" name="rem_time" output="screen">
+        <param name="time" value="180" />
+        <param name="unit" value="1" />
+    </node>
+    <node pkg="burger_war_dev" type="BDA_strategy.py" name="BDA_strategy" output="screen"> 
+    </node>
 
-    <!-- Navigation sample program  -->
-    <!--
-    <include file="$(find burger_navigation)/launch/burger_navigation.launch" />
-    <node pkg="burger_war_dev" type="navirun.py" name="navirun" output="screen"/>
-    -->
-    <!-- END Navigation sample program node -->
+    <include file="$(find burger_war_dev)/launch/obstacle_detector.launch">
+    </include>
+      <!-- laser_filter --><!--/scanからポール範囲を除去した/scan_filterdをパブリッシュする-->
+    <node pkg="laser_filters" type="scan_to_scan_filter_chain" name="laser_filter">
+        <rosparam command="load" file="$(find laser_filters)/config/laser_filter1.yaml" />
+    </node>
+    <!-- END my program node -->
+
 
     <!-- End of your space  -->
 </launch>
