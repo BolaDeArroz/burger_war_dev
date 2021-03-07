@@ -8,9 +8,7 @@ import smach
 
 class bevavior_escape(smach.State):
     def __init__(self):
-        # bot name 
-        robot_name=''
-        self.name = robot_name
+
         smach.State.__init__(self, outcomes=['outcome'])
 
         

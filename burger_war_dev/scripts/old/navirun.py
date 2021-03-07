@@ -55,7 +55,7 @@ class NaviBot():
 
         #warstate subscriber
         self.war_state = None
-        self.war_state_sub = rospy.Subscriber("/"+self.name+"/war_state", String, self.warstate_callback)
+        self.war_state_sub = rospy.Subscriber("/war_state", String, self.warstate_callback)
 
         # camera subscribver
         # for convert image topic to opencv obj

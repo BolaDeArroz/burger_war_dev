@@ -20,9 +20,6 @@ from image_function import Normalization, detect_enemy_robot
 
 class EnemyFinderFromCamera():
     def __init__(self):
-        # bot name 
-        robot_name=''
-        self.name = robot_name
         # camera info
         self.horizontal_angle = 60
 
@@ -32,9 +29,9 @@ class EnemyFinderFromCamera():
         self.enemy_pose_pub=rospy.Publisher('enemy_pose_from_camera',MyPose,queue_size=1)
         # sub
         self.image = None
-        self.img_sub = rospy.Subscriber("/{}/image_raw".format(self.name), Image, self.image_callback)
+        self.img_sub = rospy.Subscriber("/image_raw", Image, self.image_callback)
         self.my_pose = None
-        self.my_pose_sub = rospy.Subscriber('/{}/my_pose'.format(self.name), MyPose, self.my_pose_callback)
+        self.my_pose_sub = rospy.Subscriber('/my_pose', MyPose, self.my_pose_callback)
 
         self.theta= 0
         self.ds= 0
