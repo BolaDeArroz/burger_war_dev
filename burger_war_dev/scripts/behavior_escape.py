@@ -19,9 +19,6 @@ from burger_war_dev.msg import MyPose
 import my_move_base
 class bevavior_escape(smach.State):
     def __init__(self):
-        #robot name 
-        robot_name=''
-        self.name = robot_name
        
         smach.State.__init__(self, outcomes=['outcome'])
         #内部のステートマシンsm_subを定義
@@ -73,18 +70,16 @@ class CalcEnemyPos(smach.State):
         smach.State.__init__(self,  outcomes=['is_EnemyFound','is_receiveStopSig'],
                                     output_keys=['enemy_pos_out'])
 
-        robot_name=''
-        self.name = robot_name
         #停止トピックを受け取るための定義。         
-        self.sub_stop = rospy.Subscriber('/{}/state_stop'.format(self.name), Bool, self.stop_callback)
+        self.sub_stop = rospy.Subscriber('/state_stop', Bool, self.stop_callback)
         self.is_stop_receive=False
 
         # liderから敵位置推定トピックを受け取るための定義
-        self.sub_enemy_pos_from_lider = rospy.Subscriber('/{}/enemy_pos_from_lider_last'.format(self.name), Point, self.enemy_pos_from_lider_callback)
+        self.sub_enemy_pos_from_lider = rospy.Subscriber('/enemy_pos_from_lider_last', Point, self.enemy_pos_from_lider_callback)
         self.enemy_pos_from_lider={"enemy_pos":Point(),"is_topic_receive":False}
 
         # scoreから敵位置推定トピックを受け取るための定義
-        self.sub_enemy_pos_from_score = rospy.Subscriber('/{}/enemy_pos_from_score'.format(self.name), Float32MultiArray, self.enemy_pos_from_score_callback)
+        self.sub_enemy_pos_from_score = rospy.Subscriber('/enemy_pos_from_score', Float32MultiArray, self.enemy_pos_from_score_callback)
         self.enemy_pos_from_score=Float32MultiArray()
 
     def execute(self,userdata):
@@ -131,19 +126,17 @@ class GoToEscapePoint(smach.State):
                                     input_keys=['enemy_pos_in'],
                                     output_keys=['enemy_pos_out'])
 
-        robot_name=''
-        self.name = robot_name
 
         #停止トピックを受け取るための定義。         
-        self.sub_stop = rospy.Subscriber('/{}/state_stop'.format(self.name), Bool, self.stop_callback)
+        self.sub_stop = rospy.Subscriber('/state_stop', Bool, self.stop_callback)
         self.is_stop_receive=False
 
         # liderから敵位置推定トピックを受け取るための定義
-        self.sub_enemy_pos_from_lider = rospy.Subscriber('/{}/enemy_pos_from_lider'.format(self.name), Point, self.enemy_pos_from_lider_callback)
+        self.sub_enemy_pos_from_lider = rospy.Subscriber('/enemy_pos_from_lider', Point, self.enemy_pos_from_lider_callback)
         self.enemy_pos_from_lider={"enemy_pos":Point(),"is_topic_receive":False}
 
         # 自己位置トピックを受け取るための定義
-        self.sub_my_pose = rospy.Subscriber('/{}/my_pose'.format(self.name), MyPose, self.my_pose_callback)
+        self.sub_my_pose = rospy.Subscriber('/my_pose', MyPose, self.my_pose_callback)
         self.my_pose=MyPose()
 
         #Move base クライアント
@@ -222,6 +215,7 @@ class GoToEscapePoint(smach.State):
         else:#候補座標無い場合 
             #v2と同じ座標
             idx=(int(round(math.degrees(math.atan2(-en_x,en_y))/45))+4) % len(escape_pos_list) 
+            print("idx=",idx)
         #ゴール時の方向はマップ中心を向く
         return enable_pos_list[idx]["x"],enable_pos_list[idx]["y"],math.atan2(enable_pos_list[idx]["y"],enable_pos_list[idx]["x"])-math.pi
 

@@ -53,12 +53,10 @@ class behavior_strategy(smach.State):
         smach.State.__init__(self, outcomes=['escape','attack','disturb','end'])
         #次の状態を決めるためのダミー変数
         self.dummy_counter=0
-        # bot name 
-        robot_name=''
-        self.name = robot_name
+
         # sub
         self.strategy = None
-        self.strategy_sub = rospy.Subscriber('/{}/strategy'.format(self.name), String, self.strategy_callback)
+        self.strategy_sub = rospy.Subscriber('/strategy', String, self.strategy_callback)
 
 
     def strategy_callback(self, data):
