@@ -159,7 +159,7 @@ class PubTrapPose():
 
       obstacle_msg = ObstacleArrayMsg() 
       obstacle_msg.header.stamp = rospy.Time.now()
-      obstacle_msg.header.frame_id = "odom" # CHANGE HERE: odom/map
+      obstacle_msg.header.frame_id = "map" # CHANGE HERE: odom/map
       
       # Add polygon obstacle
       obstacle_msg.obstacles.append(ObstacleMsg())
