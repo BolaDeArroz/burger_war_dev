@@ -14,9 +14,6 @@ from std_msgs.msg import String
 
 class PubScore():
     def __init__(self):
-        # bot name 
-        robot_name=''
-        self.name = robot_name
         # markers name: order is decided by zyali's board
         self.markers_name_list = [
             'Tomato_N', 'Omelette_N',
@@ -30,7 +27,7 @@ class PubScore():
 
         # sub
         self.war_state=None
-        self.war_state_sub = rospy.Subscriber('/{}/war_state'.format(self.name), String, self.warstate_callback)
+        self.war_state_sub = rospy.Subscriber('/war_state', String, self.warstate_callback)
         # pub
         self.score_pub = rospy.Publisher("score", Int32MultiArray, queue_size=1)
 

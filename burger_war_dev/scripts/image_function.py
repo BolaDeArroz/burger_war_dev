@@ -70,6 +70,34 @@ def createMaskImage(hsv, hue, sat, val):
     return cv2.inRange(hsv, np.array([hmin, smin, vmin]), np.array([hmax, smax, vmax]))
 
 
+def detect_field_trap(frame):
+    result_dict = {}
+    img = frame
+
+    # convert to HSV (Hue, Saturation, Value(Brightness))
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    # cv2.imshow("Hue", hsv[:, :, 0])
+    """
+    use the bgr method at gazebo because hsv not show
+    """
+    # find red ball
+    # bgr use only gazebo
+    rnb_yellow = createMaskImage(img, [0, 10], [230 , 255], [230, 255])
+    # hsv
+    # rnb_yellow = createMaskImage(hsv, [40 , 90], [0, 110], [0, 255])
+    # cv2.imshow("1", rnb_yellow)
+    # METHOD1: fill hole in the object using Closing process (Dilation next to Erosion) of mathematical morphology
+    rnb_yellow = cv2.morphologyEx(rnb_yellow, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(15,15)))
+    # cv2.imshow("2", rnb_yellow)
+    rnb_yellow = cv2.morphologyEx(rnb_yellow, cv2.MORPH_CLOSE, cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(4,4)))
+    # cv2.imshow("3", rnb_yellow)
+    im, contours, hierarchy = cv2.findContours(rnb_yellow, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    Draw_txt(im, contours, hierarchy,img)
+    draw_obj_label(contours, "yellow", img, "yellow")
+    
+    return contours
+
+
 def detect_enemy_robot(frame):
     result_dict = {}
     img = frame

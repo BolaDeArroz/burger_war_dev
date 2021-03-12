@@ -75,17 +75,15 @@ class AroundDisturb(smach.State):
                                     output_keys=['enemy_pos_out'])
         
         #停止トピックを受け取るための定義。 
-        robot_name=''
-        self.name = robot_name
-        self.stop_sub = rospy.Subscriber('/{}/state_stop'.format(self.name), Bool, self.stop_callback)
+        self.stop_sub = rospy.Subscriber('/state_stop', Bool, self.stop_callback)
         self.is_stop_receive=False
 
         # liderから敵位置推定トピックを受け取るための定義
-        self.sub_enemy_pos_from_lider = rospy.Subscriber('/{}/enemy_pos_from_lider'.format(self.name), Point, self.enemy_pos_from_lider_callback)
+        self.sub_enemy_pos_from_lider = rospy.Subscriber('/enemy_pos_from_lider', Point, self.enemy_pos_from_lider_callback)
         self.enemy_pos_from_lider={"enemy_pos":Point(),"is_topic_receive":False}
 
         # scoreから敵位置推定トピックを受け取るための定義
-        self.sub_enemy_pos_from_score = rospy.Subscriber('/{}/enemy_pos_from_score'.format(self.name), Float32MultiArray, self.enemy_pos_from_score_callback)
+        self.sub_enemy_pos_from_score = rospy.Subscriber('/enemy_pos_from_score', Float32MultiArray, self.enemy_pos_from_score_callback)
         self.enemy_pos_from_score=Float32MultiArray()
 
 
@@ -142,20 +140,18 @@ class GoEnemyPos(smach.State):
                                     input_keys=['enemy_pos_in'])
         
         #停止トピックを受け取るための定義。 
-        robot_name=''
-        self.name = robot_name
-        self.stop_sub = rospy.Subscriber('/{}/state_stop'.format(self.name), Bool, self.stop_callback)
+        self.stop_sub = rospy.Subscriber('/state_stop', Bool, self.stop_callback)
         self.is_stop_receive=False
 
         # liderから敵位置推定トピックを受け取るための定義
-        self.sub_enemy_pos_from_lider = rospy.Subscriber('/{}/enemy_pos_from_lider'.format(self.name), Point, self.enemy_pos_from_lider_callback)
+        self.sub_enemy_pos_from_lider = rospy.Subscriber('/enemy_pos_from_lider', Point, self.enemy_pos_from_lider_callback)
         self.enemy_pos_from_lider={"enemy_pos":Point(),"is_topic_receive":False}
         # for tracking
         self.image = None
-        self.img_sub = rospy.Subscriber("/{}/image_raw".format(self.name), Image, self.image_callback)
+        self.img_sub = rospy.Subscriber("/image_raw", Image, self.image_callback)
         self.bridge = CvBridge()
         # my pose
-        self.sub_my_pose = rospy.Subscriber('/{}/my_pose'.format(self.name), MyPose, self.my_pose_callback)
+        self.sub_my_pose = rospy.Subscriber('/my_pose', MyPose, self.my_pose_callback)
         self.my_pose = MyPose()
 
         #Move base クライアント

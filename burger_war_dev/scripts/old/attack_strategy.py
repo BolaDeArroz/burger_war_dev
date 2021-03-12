@@ -12,15 +12,13 @@ from attackrun import AttackBot
 
 class AttackStrategy():
     def __init__(self):
-        # self.name = rospy.get_param("~robot_name")
-        self.name = ""
         self.rate = rospy.Rate(30)
         self.tf_listener = tf.TransformListener()
         self.mov_sub = rospy.Subscriber("array_ex", Float32MultiArray, self.enemy_callback)
 
     def init_vars(self, forced, t):
         self.forced = forced
-        self.last_my_map = get_my_map(self.tf_listener, self.name)
+        self.last_my_map = get_my_map(self.tf_listener)
         self.last_enemy_local = calc_enemy_local(self.move, self.size, self.width)
         self.last_time = t
         self.detection_time = 0
@@ -52,7 +50,7 @@ class AttackStrategy():
     def strategy(self, t):
         dt = (t - self.last_time).to_sec()
 
-        self.last_my_map = get_my_map(self.tf_listener, self.name)
+        self.last_my_map = get_my_map(self.tf_listener)
 
         if (dt < 0.001) or (self.last_my_map is None):
             return ATK_STRATEGY_CONTINUE
@@ -112,9 +110,9 @@ class MapInfo():
         self.a = a
 
 
-def get_my_map(tf_listener, bot_name):
+def get_my_map(tf_listener):
     try:
-        ts, qt = tf_listener.lookupTransform(bot_name + "/map", bot_name + "/base_link", rospy.Time())
+        ts, qt = tf_listener.lookupTransform("/map", "/base_link", rospy.Time())
 
         el = tf.transformations.euler_from_quaternion(qt)
 

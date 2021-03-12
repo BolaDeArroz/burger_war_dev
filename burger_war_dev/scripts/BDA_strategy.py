@@ -16,17 +16,15 @@ from geometry_msgs.msg import Point
 from burger_war_dev.msg import MyPose 
 
 
-ESCAPE_DISTANCE = 0.9
+ESCAPE_DISTANCE = 1.1
 
 CONTINUE_ATTACK_TIME = 0
-CONTINUE_ESCAPE_TIME = 0
-CONTINUE_DISTURB_TIME = 0
+CONTINUE_ESCAPE_TIME = 2
+CONTINUE_DISTURB_TIME = 3
 
 class BDA_strategy():
     def __init__(self):
         # bot name 
-        robot_name=''
-        self.name = robot_name
         self.all_state_list = ['attack', 'escape', 'disturb']
 
         # Message subscribers
@@ -55,29 +53,29 @@ class BDA_strategy():
         present status
         - 
         """
-        self.sub_enemy_pos_from_score = rospy.Subscriber('/{}/enemy_pos_from_score'.format(self.name), Float32MultiArray, self.enemy_pos_from_score_callback)
+        self.sub_enemy_pos_from_score = rospy.Subscriber('/enemy_pos_from_score', Float32MultiArray, self.enemy_pos_from_score_callback)
         self.enemy_pos_from_score=Float32MultiArray()
 
-        self.sub_score = rospy.Subscriber('/{}/score'.format(self.name),Int32MultiArray,self.score_callback)
+        self.sub_score = rospy.Subscriber('/score',Int32MultiArray,self.score_callback)
         self.score = []
 
-        self.sub_enemy_pos_from_lider = rospy.Subscriber('/{}/enemy_pos_from_lider'.format(self.name), Point, self.enemy_pos_from_lider_callback)
+        self.sub_enemy_pos_from_lider = rospy.Subscriber('/enemy_pos_from_lider', Point, self.enemy_pos_from_lider_callback)
         self.enemy_pos_from_lider={"enemy_pos":Point(),"is_topic_receive":False}
         
         self.sub_rem_time=rospy.Subscriber('rem_time',Time,self.rem_time_callback)
         self.rem_time = Time()
 
-        self.sub_my_pose = rospy.Subscriber('/{}/my_pose'.format(self.name), MyPose, self.my_pose_callback)
+        self.sub_my_pose = rospy.Subscriber('/my_pose', MyPose, self.my_pose_callback)
         self.my_pose = MyPose()
 
-        self.sub_enemy_pose_from_camera = rospy.Subscriber('/{}/enemy_pose_from_camera'.format(self.name), MyPose, self.enemy_pose_from_camera_callback)
+        self.sub_enemy_pose_from_camera = rospy.Subscriber('/enemy_pose_from_camera', MyPose, self.enemy_pose_from_camera_callback)
         self.enemy_pose_from_camera = MyPose()
 
         self.current_state = None
 
         # pub
-        self.pub_strategy = rospy.Publisher('/{}/strategy'.format(self.name), String, queue_size=1)
-        self.pub_state_stop = rospy.Publisher('/{}/state_stop'.format(self.name), Bool, queue_size=1)
+        self.pub_strategy = rospy.Publisher('/strategy', String, queue_size=1)
+        self.pub_state_stop = rospy.Publisher('/state_stop', Bool, queue_size=1)
 
         # thread
         # Start a thread in the background to update the server list
@@ -319,7 +317,7 @@ class BDA_strategy():
             # check chaned result
             if stop_send_result == True:
                 # resend
-                if prev_real_state == self.current_state and resend_count<20:
+                if prev_real_state == self.current_state and resend_count<3:
                     self.pub_state_stop.publish(True)
                     print('++++++++++++ resend +++++++++++++')
                     resend_count = resend_count+1

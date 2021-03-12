@@ -50,9 +50,7 @@ class State_A(smach.State):
         smach.State.__init__(self, outcomes=['outcome1','outcome2'])
         
         #停止トピックを受け取るための定義。 
-        robot_name=''
-        self.name = robot_name
-        self.stop_sub = rospy.Subscriber('/{}/state_stop'.format(self.name), Bool, self.stop_callback)
+        self.stop_sub = rospy.Subscriber('/state_stop', Bool, self.stop_callback)
         self.is_stop_receive=False
 
     def execute(self,userdata):
@@ -78,9 +76,7 @@ class State_B(smach.State):
         smach.State.__init__(self, outcomes=['outcome1','outcome2'])
         
         #停止トピックを受け取るための定義。 
-        robot_name=''
-        self.name = robot_name
-        self.stop_sub = rospy.Subscriber('/{}/state_stop'.format(self.name), Bool, self.stop_callback)
+        self.stop_sub = rospy.Subscriber('/state_stop', Bool, self.stop_callback)
         self.is_stop_receive=False
 
     def execute(self,userdata):

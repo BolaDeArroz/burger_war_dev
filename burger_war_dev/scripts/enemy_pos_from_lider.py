@@ -25,13 +25,10 @@ from obstacle_detector.msg import Obstacles
 
 class enemy_pos_from_lider:
     def __init__(self):
-        # bot name 
-        robot_name=''
-        self.name = robot_name
 
         # /Obstaclesトピックサブスクライブ用
         self.obstacles=Obstacles()
-        self.obstacles_sub = rospy.Subscriber('/{}/obstacles'.format(self.name), Obstacles, self.obstacle_callback)
+        self.obstacles_sub = rospy.Subscriber('/obstacles', Obstacles, self.obstacle_callback)
 
         # /敵位置トピックパブ用
         self.pub_enemy_pos=rospy.Publisher('enemy_pos_from_lider',Point,queue_size=1)

@@ -34,10 +34,6 @@ from calc_motion_planning import rotation_operate, check_possession_marker
 
 class AttackBot():
     def __init__(self):
-        # bot name 
-        # robot_name=''
-        robot_name = ''
-        self.name = robot_name
         
         # velocity publisher
         self.vel_pub = rospy.Publisher('cmd_vel', Twist,queue_size=1)
@@ -45,22 +41,22 @@ class AttackBot():
 
         # lidar scan subscriber
         self.scan = LaserScan()
-        self.lidar_sub = rospy.Subscriber('/{}/scan'.format(self.name), LaserScan, self.lidar_callback)
+        self.lidar_sub = rospy.Subscriber('/scan', LaserScan, self.lidar_callback)
 
         # camera subscribver
         # for convert image topic to opencv obj
         self.image = None
         self.bridge = CvBridge()
-        self.image_sub = rospy.Subscriber('/{}/image_raw'.format(self.name), Image, self.image_callback)
-        self.camerainfo_sub = rospy.Subscriber("/{}/camera_info".format(self.name),CamInfoMSG, self.camerainfo_callback)
+        self.image_sub = rospy.Subscriber('/image_raw', Image, self.image_callback)
+        self.camerainfo_sub = rospy.Subscriber("/camera_info",CamInfoMSG, self.camerainfo_callback)
 
         #warstate subscriber
         self.war_state = None
-        self.war_state_sub = rospy.Subscriber('/{}/war_state'.format(self.name), String, self.warstate_callback)
+        self.war_state_sub = rospy.Subscriber('/war_state', String, self.warstate_callback)
 
         # test nuvirun
         self.current_global_plan = Path()
-        rospy.Subscriber("/"+self.name+"/move_base/DWAPlannerROS/global_plan", Path, self.callback)
+        rospy.Subscriber("/move_base/DWAPlannerROS/global_plan", Path, self.callback)
 
     
 
@@ -99,7 +95,7 @@ class AttackBot():
         self.client.wait_for_server()
 
         goal = MoveBaseGoal()
-        goal.target_pose.header.frame_id = self.name + "/map"
+        goal.target_pose.header.frame_id = "/map"
         goal.target_pose.header.stamp = rospy.Time.now()
         goal.target_pose.pose.position.x = x
         goal.target_pose.pose.position.y = y
@@ -134,7 +130,7 @@ class AttackBot():
         # detect counter
         detect_count = 0
         red_ball_count = 0
-        #listener.waitForTransform('/' + self.name +"/map",self.name +"/base_link", rospy.Time(),rospy.Duration(4.0))
+        #listener.waitForTransform("/map","/base_link", rospy.Time(),rospy.Duration(4.0))
         print('[ATTACK RUN] First set enemy position: x = {}, y = {}, yaw = {}'.format(enemey_position_x, enemey_position_y, enemey_position_yaw))
         result = self.set_goal(enemey_position_x, enemey_position_y, enemey_position_yaw)
         while not rospy.is_shutdown():
@@ -235,8 +231,8 @@ class AttackBot():
             
             """
             # get own local coordinate
-            listener.waitForTransform(self.name +"/map",self.name +"/base_link", now, rospy.Duration(4.0))
-            position, quaternion = listener.lookupTransform(self.name +"/map", self.name +"/base_link", rospy.Time())
+            listener.waitForTransform("/map","/base_link", now, rospy.Duration(4.0))
+            position, quaternion = listener.lookupTransform("/map", "/base_link", rospy.Time())
             print(position, quaternion)
             """
             r.sleep()
