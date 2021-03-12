@@ -11,13 +11,13 @@ class pub_my_pose:
     def __init__(self):
         self.tf_listener=tf.TransformListener()
         try:
-            self.tf_listener.waitForTransform("/odom","/base_link",rospy.Time(),rospy.Duration(4.0))
+            self.tf_listener.waitForTransform("/map","/base_link",rospy.Time(),rospy.Duration(4.0))
         except (tf.LookupException, tf.ConnectivityException):
             rospy.logerr("[rader_find_enemy]tf_err")
         except Exception as e:
             # I think this error that tf2_ros.TransformException
             print('[rader_find_enemy]', e)
-        self.tf_listener.waitForTransform("/odom","/base_link",rospy.Time(),rospy.Duration(4.0))
+        self.tf_listener.waitForTransform("/map","/base_link",rospy.Time(),rospy.Duration(4.0))
 
         self.my_pose_publisher=rospy.Publisher('my_pose',MyPose,queue_size=1)
 
@@ -25,7 +25,7 @@ class pub_my_pose:
         r=rospy.Rate(5)
         while not rospy.is_shutdown():
             #map座標系上のロボット現在位置(my_pos)・姿勢(my_ori)をtfから取得する
-            my_pos, my_ori = self.tf_listener.lookupTransform("/odom", "/base_link",rospy.Time())
+            my_pos, my_ori = self.tf_listener.lookupTransform("/map", "/base_link",rospy.Time())
             #姿勢(my_ori)がQuaternion形式なのでEuler形式(my_eul)に変換する
             my_eul=tf.transformations.euler_from_quaternion(my_ori)
             #my_posはxが横軸、yが縦軸になるように並び替える。
