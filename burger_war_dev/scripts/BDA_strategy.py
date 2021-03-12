@@ -16,11 +16,11 @@ from geometry_msgs.msg import Point
 from burger_war_dev.msg import MyPose 
 
 
-ESCAPE_DISTANCE = 0.9
+ESCAPE_DISTANCE = 1.1
 
 CONTINUE_ATTACK_TIME = 0
-CONTINUE_ESCAPE_TIME = 0
-CONTINUE_DISTURB_TIME = 0
+CONTINUE_ESCAPE_TIME = 2
+CONTINUE_DISTURB_TIME = 3
 
 class BDA_strategy():
     def __init__(self):
@@ -317,7 +317,7 @@ class BDA_strategy():
             # check chaned result
             if stop_send_result == True:
                 # resend
-                if prev_real_state == self.current_state and resend_count<20:
+                if prev_real_state == self.current_state and resend_count<3:
                     self.pub_state_stop.publish(True)
                     print('++++++++++++ resend +++++++++++++')
                     resend_count = resend_count+1

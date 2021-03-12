@@ -231,10 +231,10 @@ class GoToEscapePoint(smach.State):
         enemy_pos=userdata.enemy_pos_in
         print("enemy_pos",enemy_pos)
         
-        #escape_pos_x,escape_pos_y,escape_yaw=self.calc_escape_pos_v1(enemy_pos.x,enemy_pos.y)#中心挟んで相手の反対地点に逃げるパターン
+        escape_pos_x,escape_pos_y,escape_yaw=self.calc_escape_pos_v1(enemy_pos.x,enemy_pos.y)#中心挟んで相手の反対地点に逃げるパターン
         #escape_pos_x,escape_pos_y,escape_yaw=self.calc_escape_pos_v2(enemy_pos.x,enemy_pos.y)#相手の位置によって反対側の決まった地点に逃げるパターン
-        #escape_pos_x,escape_pos_y,escape_yaw=self.calc_escape_pos_v3(enemy_pos.x,enemy_pos.y)#相手の位置によって反対側の決まった地点に逃げるパターン
-        escape_pos_x,escape_pos_y,escape_yaw=self.calc_escape_pos_v4(enemy_pos.x,enemy_pos.y,self.my_pose.pos.x,self.my_pose.pos.y)#相手の位置によって反対側の決まった地点に逃げるパターン
+        # escape_pos_x,escape_pos_y,escape_yaw=self.calc_escape_pos_v3(enemy_pos.x,enemy_pos.y)#相手の位置によって反対側の決まった地点に逃げるパターン
+        # escape_pos_x,escape_pos_y,escape_yaw=self.calc_escape_pos_v4(enemy_pos.x,enemy_pos.y,self.my_pose.pos.x,self.my_pose.pos.y)#相手の位置によって反対側の決まった地点に逃げるパターン
        
         #print(escape_pos_x,escape_pos_y,escape_yaw)
 
