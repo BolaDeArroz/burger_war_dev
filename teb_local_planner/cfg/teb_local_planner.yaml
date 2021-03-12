@@ -17,9 +17,9 @@ TebLocalPlannerROS:
  max_vel_x: 0.22
  max_vel_x_backwards: 0.22
  max_vel_theta: 1.0
- acc_lim_x: 0.5
- acc_lim_theta: 0.6
- min_turning_radius: 0.0
+ acc_lim_x: 0.5                 #Maximum translational acceleration of the robot in meters/sec^2
+ acc_lim_theta: 0.6             #Maximum angular acceleration of the robot in radians/sec^2
+ min_turning_radius: 0.0        #Minimum turning radius of a carlike robot (set to zero for a diff-drive robot).
  footprint_model: # types: "point", "circular", "two_circles", "line", "polygon"
    type: "circular"
    radius: 0.08 # for type "circular"
@@ -32,7 +32,7 @@ TebLocalPlannerROS:
     
  # Obstacles
     
- min_obstacle_dist: 0.05
+ min_obstacle_dist: 0.02
  include_costmap_obstacles: True
  costmap_obstacles_behind_robot_dist: 1.0
  obstacle_poses_affected: 30
