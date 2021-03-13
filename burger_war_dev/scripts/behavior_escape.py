@@ -148,6 +148,8 @@ class GoToEscapePoint(smach.State):
         # 移動途中に敵を発見した時に、目的地を切り替えるしきい値[m](前回の敵座標-発見した敵座標)
         self.CHANGE_ESCAPE_POS_TH=0.50
 
+        # 前回と同じ場所に逃げないための
+        self.last_escape_idx = -1
 
     def calc_escape_pos_v1(self,x,y):
             #ゴール時の方向はマップ中心を向く
@@ -203,21 +205,29 @@ class GoToEscapePoint(smach.State):
         #print("my_=",escape_dist_from_my)
         #敵-自分
         compare_dist=          [en-my for en,my in zip(escape_dist_from_enemy,escape_dist_from_my)] 
-        print("en_my_=",compare_dist)
+        #print("en_my_=",compare_dist)
         
-        #候補を自分のほうが近い地点
-        #      現在地点から一定以上離れた地点(スタック防止のため)
-        # のみに絞る
+        #候補を
+        #     自分のほうが近い地点
+        #かつ 現在地点から一定以上離れた地点(スタック防止のため)
+        #のみに絞る
         enable_pos_list=[pos for comp_dist,dist_from_my,pos in zip(compare_dist,escape_dist_from_my,escape_pos_list) if comp_dist>=0 and dist_from_my >=0.50]
-        if len(enable_pos_list) >=1: 
+        if len(enable_pos_list) >=1: #1個以上候補座標がある時
+            # それぞれの場所の敵からの距離を図る
             enable_pos_dist=[self.get_distance(en_x,en_y,pos["x"],pos["y"]) for pos in enable_pos_list]
-            idx=enable_pos_dist.index(max(enable_pos_dist))
-        else:#候補座標無い場合 
-            #v2と同じ座標
-            idx=(int(round(math.degrees(math.atan2(-en_x,en_y))/45))+4) % len(escape_pos_list) 
-            print("idx=",idx)
-        #ゴール時の方向はマップ中心を向く
-        return enable_pos_list[idx]["x"],enable_pos_list[idx]["y"],math.atan2(enable_pos_list[idx]["y"],enable_pos_list[idx]["x"])-math.pi
+            # 敵から最も遠い場所を選択
+            for x in range(len(enable_pos_dist)):
+                idx = enable_pos_dist.index(sorted(enable_pos_dist)[-(x+1)]) # sorted(list)[-1] でlist内の最大値
+                print(self.last_escape_idx,idx)
+                if(self.last_escape_idx != idx):# 前回の位置と違う場合、それに決定
+                    self.last_escape_idx = idx
+                    #ゴール時の方向はマップ中心を向く
+                    return enable_pos_list[idx]["x"], enable_pos_list[idx]["y"], math.atan2(enable_pos_list[idx]["y"],enable_pos_list[idx]["x"])-math.pi
+
+        #候補座標無い場合 
+        #v2と同じ座標
+        return self.calc_escape_pos_v2(en_x,en_y)
+        
 
 
     def execute(self,userdata):
@@ -231,14 +241,14 @@ class GoToEscapePoint(smach.State):
         enemy_pos=userdata.enemy_pos_in
         print("enemy_pos",enemy_pos)
         
-        escape_pos_x,escape_pos_y,escape_yaw=self.calc_escape_pos_v1(enemy_pos.x,enemy_pos.y)#中心挟んで相手の反対地点に逃げるパターン
-        #escape_pos_x,escape_pos_y,escape_yaw=self.calc_escape_pos_v2(enemy_pos.x,enemy_pos.y)#相手の位置によって反対側の決まった地点に逃げるパターン
+        #escape_pos_x,escape_pos_y,escape_yaw=self.calc_escape_pos_v1(enemy_pos.x,enemy_pos.y)#中心挟んで相手の反対地点に逃げるパターン
+        # escape_pos_x,escape_pos_y,escape_yaw=self.calc_escape_pos_v2(enemy_pos.x,enemy_pos.y)#相手の位置によって反対側の決まった地点に逃げるパターン
         # escape_pos_x,escape_pos_y,escape_yaw=self.calc_escape_pos_v3(enemy_pos.x,enemy_pos.y)#相手の位置によって反対側の決まった地点に逃げるパターン
-        # escape_pos_x,escape_pos_y,escape_yaw=self.calc_escape_pos_v4(enemy_pos.x,enemy_pos.y,self.my_pose.pos.x,self.my_pose.pos.y)#相手の位置によって反対側の決まった地点に逃げるパターン
+        escape_pos_x,escape_pos_y,escape_yaw=self.calc_escape_pos_v4(enemy_pos.x,enemy_pos.y,self.my_pose.pos.x,self.my_pose.pos.y)#相手の位置によって反対側の決まった地点に逃げるパターン
        
         #print(escape_pos_x,escape_pos_y,escape_yaw)
 
-        #ゴール設定
+        #ゴール設定(TODO:設定出来ない時)
         my_move_base.setGoal(self.move_base_client,escape_pos_x,escape_pos_y,escape_yaw)
         
         # rospy終了か、ゴールに着いたらループ抜ける。
@@ -274,7 +284,6 @@ class GoToEscapePoint(smach.State):
                     return 'is_NearEnemyFound' #抜ける。再計算されて、目的地が変更される。
 
             
-            #TODO:ゴールが壁の中になった時の対応
             r.sleep()
         #目的地についた場合
         rosparam.set_param("/move_base/GlobalPlanner/orientation_mode", "1")#(None=0, Forward=1, Interpolate=2, ForwardThenInterpolate=3, Backward=4, Leftward=5, Rightward=6)
