@@ -16,11 +16,13 @@ from geometry_msgs.msg import Point
 from burger_war_dev.msg import MyPose 
 
 
-ESCAPE_DISTANCE = 1.1
+ESCAPE_DISTANCE = 0.8
 
 CONTINUE_ATTACK_TIME = 0
 CONTINUE_ESCAPE_TIME = 2
 CONTINUE_DISTURB_TIME = 3
+
+STAG_LENGTH = 0.1
 
 class BDA_strategy():
     def __init__(self):
@@ -125,8 +127,8 @@ class BDA_strategy():
         while self._keep_running:
             self._stagnation = False
             
-            if abs(x_prev_my_pos - self.my_pose.pos.x) < 0.01:
-                if abs(y_prev_my_pos - self.my_pose.pos.y) < 0.01:
+            if abs(x_prev_my_pos - self.my_pose.pos.x) < STAG_LENGTH:
+                if abs(y_prev_my_pos - self.my_pose.pos.y) < STAG_LENGTH:
                     stag_count = stag_count+1
                     # 3 straight count
                     if stag_count > 3:

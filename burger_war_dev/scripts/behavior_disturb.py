@@ -162,6 +162,12 @@ class GoEnemyPos(smach.State):
 
 
     def execute(self,userdata):
+        # 取り敢えず進む
+        print('*********straight')
+        twist = rotation_operate(3)
+        self.vel_pub.publish(twist)
+        rospy.sleep(1)
+
         #パラメータ初期化
         self.enemy_pos_from_lider={"enemy_pos":Point(),"is_topic_receive":False}
 
