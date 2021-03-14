@@ -16,10 +16,10 @@ from geometry_msgs.msg import Point
 from burger_war_dev.msg import MyPose 
 
 
-ESCAPE_DISTANCE = 0.8
+ESCAPE_DISTANCE = 1.2
 
 CONTINUE_ATTACK_TIME = 0
-CONTINUE_ESCAPE_TIME = 2
+CONTINUE_ESCAPE_TIME = 4
 CONTINUE_DISTURB_TIME = 3
 
 STAG_LENGTH = 0.1
