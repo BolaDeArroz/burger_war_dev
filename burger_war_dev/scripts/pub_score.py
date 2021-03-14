@@ -47,9 +47,6 @@ class PubScore():
             result = map(lambda x: x *-1, result)
 
         _array.data = result
-        print('*************************', self.markers_name_list)
-        print("pub score ", result)
-        print("self.side ", self.side)
         self.score_pub.publish(_array)
         
 
