@@ -199,13 +199,13 @@ class GoToEscapePoint(smach.State):
         ]
         #敵から地点の距離
         escape_dist_from_enemy=[self.get_distance(en_x,en_y,pos["x"],pos["y"]) for pos in escape_pos_list ]
-        #print("enemy_=",escape_dist_from_enemy)
+        #print("[ESCAPE]enemy_=",escape_dist_from_enemy)
         #自分から地点の距離
         escape_dist_from_my=   [self.get_distance(my_x,my_y,pos["x"],pos["y"]) for pos in escape_pos_list ]
-        #print("my_=",escape_dist_from_my)
+        #print("[ESCAPE]my_=",escape_dist_from_my)
         #敵-自分
         compare_dist=          [en-my for en,my in zip(escape_dist_from_enemy,escape_dist_from_my)] 
-        #print("en_my_=",compare_dist)
+        #print("[ESCAPE]en_my_=",compare_dist)
         
         #候補を
         #     自分のほうが近い地点
@@ -218,7 +218,7 @@ class GoToEscapePoint(smach.State):
             # 敵から最も遠い場所を選択
             for x in range(len(enable_pos_dist)):
                 idx = enable_pos_dist.index(sorted(enable_pos_dist)[-(x+1)]) # sorted(list)[-1] でlist内の最大値
-                print(self.last_escape_idx,idx)
+                print("[ESCAPE]",self.last_escape_idx,idx)
                 if(self.last_escape_idx != idx):# 前回の位置と違う場合、それに決定
                     self.last_escape_idx = idx
                     #ゴール時の方向はマップ中心を向く
@@ -239,14 +239,14 @@ class GoToEscapePoint(smach.State):
 
         #逃げる位置計算
         enemy_pos=userdata.enemy_pos_in
-        print("enemy_pos",enemy_pos)
+        print("[ESCAPE]enemy_pos",enemy_pos)
         
         #escape_pos_x,escape_pos_y,escape_yaw=self.calc_escape_pos_v1(enemy_pos.x,enemy_pos.y)#中心挟んで相手の反対地点に逃げるパターン
         # escape_pos_x,escape_pos_y,escape_yaw=self.calc_escape_pos_v2(enemy_pos.x,enemy_pos.y)#相手の位置によって反対側の決まった地点に逃げるパターン
         # escape_pos_x,escape_pos_y,escape_yaw=self.calc_escape_pos_v3(enemy_pos.x,enemy_pos.y)#相手の位置によって反対側の決まった地点に逃げるパターン
         escape_pos_x,escape_pos_y,escape_yaw=self.calc_escape_pos_v4(enemy_pos.x,enemy_pos.y,self.my_pose.pos.x,self.my_pose.pos.y)#相手の位置によって反対側の決まった地点に逃げるパターン
        
-        #print(escape_pos_x,escape_pos_y,escape_yaw)
+        #print([ESCAPE]escape_pos_x,escape_pos_y,escape_yaw)
 
         #ゴール設定(TODO:設定出来ない時)
         my_move_base.setGoal(self.move_base_client,escape_pos_x,escape_pos_y,escape_yaw)
@@ -255,8 +255,9 @@ class GoToEscapePoint(smach.State):
         self.is_stop_receive=False
         r = rospy.Rate(5)
         while (not rospy.is_shutdown()) and \
-                self.move_base_client.get_state() in [  actionlib_msgs.msg.GoalStatus.ACTIVE,\
-                                                        actionlib_msgs.msg.GoalStatus.PENDING]:
+                self.move_base_client.get_state() in [  actionlib_msgs.msg.GoalStatus.PENDING,
+                                                        actionlib_msgs.msg.GoalStatus.ACTIVE,
+                                                        ]:
 
             #逃げる途中で,ストップトピックを受け取った場合
             if self.is_stop_receive == True:
@@ -276,7 +277,7 @@ class GoToEscapePoint(smach.State):
                 #前回の敵位置との距離を計算
                 dist=self.get_distance(                          enemy_pos.x,                             enemy_pos.y,\
                                     self.enemy_pos_from_lider["enemy_pos"].x,self.enemy_pos_from_lider["enemy_pos"].y)
-                # print("dist",dist)
+                # print("[ESCAPE]dist",dist)
                 if dist >= self.CHANGE_ESCAPE_POS_TH: #しきい値を上回っていた場合
                     userdata.enemy_pos_out=self.enemy_pos_from_lider["enemy_pos"]
                     self.move_base_client.cancel_goal()
@@ -285,6 +286,8 @@ class GoToEscapePoint(smach.State):
 
             
             r.sleep()
+
+        print("[ESCAPE]move_base_client.get_state()",self.move_base_client.get_state())
         #目的地についた場合
         rosparam.set_param("/move_base/GlobalPlanner/orientation_mode", "1")#(None=0, Forward=1, Interpolate=2, ForwardThenInterpolate=3, Backward=4, Leftward=5, Rightward=6)
         return 'is_Gone'

@@ -3,39 +3,58 @@ TebLocalPlannerROS:
  odom_topic: odom
  map_frame:  map
     
- # Trajectory
-  
- teb_autosize: True
- dt_ref: 0.3
- dt_hysteresis: 0.1
- global_plan_overwrite_orientation: True
- max_global_plan_lookahead_dist: 0.5
- feasibility_check_no_poses: 5
     
- # Robot
+ # Robot Configuration Parameters
         
  max_vel_x: 0.22
  max_vel_x_backwards: 0.22
  max_vel_theta: 1.0
- acc_lim_x: 0.5                 #Maximum translational acceleration of the robot in meters/sec^2
- acc_lim_theta: 0.6             #Maximum angular acceleration of the robot in radians/sec^2
- min_turning_radius: 0.0        #Minimum turning radius of a carlike robot (set to zero for a diff-drive robot).
- footprint_model: # types: "point", "circular", "two_circles", "line", "polygon"
+ acc_lim_x: 0.5                 # Maximum translational acceleration of the robot in meters/sec^2
+ acc_lim_theta: 0.6             # Maximum angular acceleration of the robot in radians/sec^2
+ min_turning_radius: 0.0        # Minimum turning radius of a carlike robot (set to zero for a diff-drive robot).
+ footprint_model:               # types: "point", "circular", "two_circles", "line", "polygon"
    type: "circular"
    radius: 0.08 # for type "circular"
 
  # GoalTolerance
     
- xy_goal_tolerance: 0.2
- yaw_goal_tolerance: 0.1
- free_goal_vel: False
+ xy_goal_tolerance: 0.2         # Allowed final euclidean distance to the goal position in meters
+ yaw_goal_tolerance: 0.1        # Allowed final orientation error in radians
+ free_goal_vel: False           # Remove the goal velocity constraint such that the robot can arrive at the goal with maximum speed
     
+ # Trajectory
+  
+ teb_autosize: True
+ dt_ref: 0.3                    # Desired temporal resolution of the trajectory (the trajectory is not fixed to dt_ref since the temporal resolution is part of the optimization, 
+                                # but the trajectory will be resized between iterations if dt_ref +-dt_hysteresis is violated.
+ 
+ dt_hysteresis: 0.1             # Hysteresis for automatic resizing depending on the current temporal resolution, usually approx. 10% of dt_ref is recommended
+ global_plan_overwrite_orientation: True # Overwrite orientation of local subgoals provided by the global planner (since they often provide only a 2D path)
+ max_global_plan_lookahead_dist: 0.5  # Specify the maximum length (cumulative Euclidean distances) of the subset of the global plan taken into account for optimization.
+                                      # The actual length is than determined by the logical conjunction of the local costmap size and this maximum bound. 
+                                      # Set to zero or negative in order to deactivate this limitation.
+
+ # force_reinit_new_goal_dist: 1.0    # Reinitialize the trajectory if a previous goal is updated with a separation of more than the specified value in meters (skip hot-starting)                                 
+ feasibility_check_no_poses: 5        # Specify up to which pose on the predicted plan the feasibility should be checked each sampling interval.
+ allow_init_with_backwards_motion: True # If true, underlying trajectories might be initialized with backwards motions in case the goal is behind the start within the local costmap 
+                                        # (this is only recommended if the robot is equipped with rear sensors).
+
+
  # Obstacles
     
- min_obstacle_dist: 0.02
- include_costmap_obstacles: True
- costmap_obstacles_behind_robot_dist: 1.0
- obstacle_poses_affected: 30
+ min_obstacle_dist: 0.05                # Minimum desired separation from obstacles in meters
+ include_costmap_obstacles: True        # Specify if obstacles of the local costmap should be taken into account. 
+                                        # Each cell that is marked as obstacle is considered as a point-obstacle.
+                                        # Therefore do not choose a very small resolution of the costmap since it increases computation time. In future releases this circumstance is going to be addressed as well as providing an additional api for dynamic obstacles.
+
+ costmap_obstacles_behind_robot_dist: 1.0 # Limit the occupied local costmap obstacles taken into account for 
+                                          # planning behind the robot (specify distance in meters).
+ obstacle_poses_affected: 30              # Each obstacle position is attached to the closest pose on the trajectory in order to keep a distance.
+                                          # Additional neighbors can be taken into account as well.
+                                          # Note, this parameter might be removed in future versions,
+                                          # since the the obstacle association strategy has been modified in kinetic+. 
+                                          # Refer to the parameter description of legacy_obstacle_association.
+                                          
  costmap_converter_plugin: ""
  #costmap_converter_plugin: "costmap_converter::CostmapToPolygonsDBSMCCH"
  costmap_converter_spin_thread: True
@@ -75,6 +94,3 @@ TebLocalPlannerROS:
  obstacle_keypoint_offset: 0.1
  obstacle_heading_threshold: 0.45
  visualize_hc_graph: False
-
- # Trajectory
- allow_init_with_backwards_motion: True
