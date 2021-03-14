@@ -22,7 +22,7 @@ class pub_my_pose:
         self.my_pose_publisher=rospy.Publisher('my_pose',MyPose,queue_size=1)
 
     def run(self):
-        r=rospy.Rate(5)
+        r=rospy.Rate(10)
         while not rospy.is_shutdown():
             #map座標系上のロボット現在位置(my_pos)・姿勢(my_ori)をtfから取得する
             my_pos, my_ori = self.tf_listener.lookupTransform("/map", "/base_link",rospy.Time())
